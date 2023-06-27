@@ -106,24 +106,6 @@ images:images,
 .catch(err =>res.json(err))
 });
 
-
-router.get("/fetch/:id", async (req, res) => {
-  post = '';
-  username= ""
-    try {
-       post = await  Postdb.findById(req.params.id)
-       username= await Userdb.findById(post.user);
-       console.log(post.username);
-
-    } catch (error) {
-      return res.json({err: error,msg:'no post with that id found'})
-    }
-
-  return res.json(post)
-  
-
-
-  });
   
 router.delete("/:id",auth, async (req, res) => {
     console.log('delete id',req.params.id)
@@ -182,107 +164,121 @@ router.delete("/:id",auth, async (req, res) => {
         });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 router.post("/update/:id",auth, async (req, res) => {
-  console.log('../',req.files)
+          console.log('../',req.files)
+        
+        console.log('====>',req.body.title,req.body.txt,req.params.id)
+        
+          if(!req.user){
+            return res.json({msg:req.user,msg2:'not allowed'})
+          }
+          if(!req.body){
+            return res.send({ message : "Data to update can not be empty"})
+        }
+        
+         try {
+          const post = await Postdb.findById(req.params.id)
+        
+        
+          if(!post){
+            return res.json({postnotfound:"post not found"})
+          }
+          let updated_data = post
+          updated_data.title = req.body.title
+          updated_data.about = req.body.about
+          updated_data.platform = req.body.platform
+        updated_data.ytLink = req.body.ytLink
+        
+          if(req.files){
+        
+        
+        try {
+          console.log('gamefile1')
+          gameFile = await gfs3fileuploader(req.files.gameFile)
+          console.log('gamefile2')
+          updated_data.gameFile = gameFile
+          gfs3filedelete(post.gameFile)
+          console.log('gamefile3')
+        } catch (error) {
+          console.log('gamefileerr')
+        }
+        
+        try {
+          
+        
+        logo = await s3fileuploader(req.files.logo)
+        console.log('deleting update logo')
+        s3filedelete(post.logo)
+        updated_data.logo = logo
+        console.log('logo', logo)
+        } catch (error) {
+          console.log('logo error', error)
+        }
+        
+        try {
+          
+        thumbnail = await s3fileuploader(req.files.thumbnail)
+        s3filedelete(post.thumbnail)
+        console.log('++++++++++++>',thumbnail)
+        updated_data.thumbnail = thumbnail
+        } catch (error) {
+          
+        }
+        
+        try {
+          images = []
+        
+        for(let x = 0; x < req.files.images.length;x++){
+        
+        data = await s3fileuploader(req.files.images[x]);
+        
+        images[x] = data
+        }
+        
+        for(x = 0; x < post.images.length; x++){
+          s3filedelete(post.images[x]);
+        
+        }
+        
+        updated_data.images = images
+        } catch (error) {
+          
+        }
+        
+        
+        
+         }else{
+         
+         }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+          if(post.user.toString() == req.user._id.toString()){
+          await post.updateOne({$set:updated_data})
+        
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        
+          return res.redirect('/dashboard/update-post?id='+req.params.id)
+          }else{
+            return res.json({ notauthorised:'access denied :- not by owner'})
+          }
+        
+         
+          } catch (error) {
+        return res.json({err:error})
+        }
+             });
 
-console.log('====>',req.body.title,req.body.txt,req.params.id)
-
-  if(!req.user){
-    return res.json({msg:req.user,msg2:'not allowed'})
-  }
-  if(!req.body){
-    return res.send({ message : "Data to update can not be empty"})
-}
-
- try {
-  const post = await Postdb.findById(req.params.id)
-
-
-  if(!post){
-    return res.json({postnotfound:"post not found"})
-  }
-  let updated_data = post
-  updated_data.title = req.body.title
-  updated_data.about = req.body.about
-  updated_data.platform = req.body.platform
-updated_data.ytLink = req.body.ytLink
-
-  if(req.files){
-
-
-try {
-  console.log('gamefile1')
-  gameFile = await gfs3fileuploader(req.files.gameFile)
-  console.log('gamefile2')
-  updated_data.gameFile = gameFile
-  gfs3filedelete(post.gameFile)
-  console.log('gamefile3')
-} catch (error) {
-  console.log('gamefileerr')
-}
-
-try {
-  
-
-logo = await s3fileuploader(req.files.logo)
-console.log('deleting update logo')
-s3filedelete(post.logo)
-updated_data.logo = logo
-console.log('logo', logo)
-} catch (error) {
-  console.log('logo error', error)
-}
-
-try {
-  
-thumbnail = await s3fileuploader(req.files.thumbnail)
-s3filedelete(post.thumbnail)
-console.log('++++++++++++>',thumbnail)
-updated_data.thumbnail = thumbnail
-} catch (error) {
-  
-}
-
-try {
-  images = []
-
-for(let x = 0; x < req.files.images.length;x++){
-
-data = await s3fileuploader(req.files.images[x]);
-
-images[x] = data
-}
-
-for(x = 0; x < post.images.length; x++){
-  s3filedelete(post.images[x]);
-
-}
-
-updated_data.images = images
-} catch (error) {
-  
-}
-
-
-
- }else{
- 
- }
+             
 
 
 
@@ -295,21 +291,50 @@ updated_data.images = images
 
 
 
-  if(post.user.toString() == req.user._id.toString()){
-  await post.updateOne({$set:updated_data})
 
-  await new Promise(resolve => setTimeout(resolve, 1000));
 
-  return res.redirect('/dashboard/update-post?id='+req.params.id)
-  }else{
-    return res.json({ notauthorised:'access denied :- not by owner'})
-  }
 
- 
-  } catch (error) {
-return res.json({err:error})
-}
-     });
+
+
+router.get("/fetch", async (req, res) => {
+          post = '';
+            try {
+               post = await  Postdb.find({})
+           } catch (error) {
+              return res.json({err: error,msg:'/fetch not found'})
+            }
+        
+          return res.json(post)
+          
+        
+        
+          });
+
+
+
+router.get("/fetch/:id", async (req, res) => {
+          post = '';
+          username= ""
+            try {
+               post = await  Postdb.findById(req.params.id)
+               username= await Userdb.findById(post.user);
+               console.log(post.username);
+        
+            } catch (error) {
+              return res.json({err: error,msg:'no post with that id found'})
+            }
+        
+          return res.json(post)
+          
+        
+        
+          });
+
+
+
+
+
+
 
 
     
