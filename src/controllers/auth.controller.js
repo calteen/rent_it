@@ -20,40 +20,34 @@ router.post("/register",
   check('password', 'Password is required')
     .isLength({ min: 1 })
   , async (req, res) => {
-    // console.log(req.body);
+     console.log(req.body);
     let errors = validationResult(req);
     console.log(errors);
     if (!errors.isEmpty()) {
-      return res.status(422).render('auth', {
+      return res.status(422).json({
         errorMessage: errors.array()[0].msg,
         doctitle:"signup"
       })
     }
+
+
+
     const name = req.body.name.toLowerCase();
     const email = req.body.email.toLowerCase();
     const password = req.body.password;
-
+    useremail = 0;
     try {
-      username = await Userdb.findOne({name:name});
       useremail = await Userdb.findOne({ email: email });
       /**
      * @description check if the username is already exists and if it exists return 
      */
-    if (username) {
-      return res.render('auth',
-        { errorMessage: 'username already in use choose different username' ,
-        doctitle:"signup"})
-    }
-
     } catch (error) {
 
     }
     
 
     if (useremail) {
-      return res.render('auth',
-        { errorMessage: 'email already in use' ,
-        doctitle:"signup"})
+      return res.json({ errorMessage: 'email already in use' })
     }
 
     try {
@@ -85,23 +79,6 @@ router.post("/register",
         expires: new Date(Date.now() + (1000 * 60 * 60 * 24 * 30)),
         httpOnly: true
       })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       return res.redirect('/dashboard');
     }
     catch (err) {
@@ -203,11 +180,5 @@ router.get("/logout", async (req, res) => {
 
 });
 
-router.get("/", (req, res) => {
-  console.log('auth')
-  res.render("auth.ejs", {
-    errorMessage: "",
-    doctitle:"login"
-  })
-})
+
 module.exports = router;
