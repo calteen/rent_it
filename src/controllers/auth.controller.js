@@ -6,50 +6,21 @@ const Userdb = require("../models/user.model");
 // let sitedomain = ".example.com:300"
 
 
-router.post("/register",
-  check('name' ,"name is required ")
-    .isLength({ min: 1 })
-    .custom((value) => {
-      if (value.indexOf(' ') >= 0) {
-        throw new Error('username must not contain spaces') 
-      }
-      return true;
-    }),
-  check('email', 'Email is required')
-    .isEmail(),
-  check('password', 'Password is required')
-    .isLength({ min: 1 })
-  , async (req, res) => {
-     console.log(req.body);
-    let errors = validationResult(req);
-    console.log(errors);
-    if (!errors.isEmpty()) {
-      return res.status(422).json({
-        errorMessage: errors.array()[0].msg,
-        doctitle:"signup"
-      })
-    }
+router.post("/register", async (req, res) => {
 
-
-
-    const name = req.body.name.toLowerCase();
+  const name = req.body.name.toLowerCase();
     const email = req.body.email.toLowerCase();
     const password = req.body.password;
     useremail = 0;
     try {
       useremail = await Userdb.findOne({ email: email });
-      /**
-     * @description check if the username is already exists and if it exists return 
-     */
     } catch (error) {
-
     }
     
 
     if (useremail) {
       return res.json({ errorMessage: 'email already in use' })
     }
-
     try {
       const hashedPassword = await bcrypt.hash(password, 12);
       // console.log(hashedPassword);
@@ -63,82 +34,41 @@ router.post("/register",
       const registered = await user.save();
 
 
-      // console.log('a')
-      const token = await registered.generateAuthToken();
-      var fullUrl =   req.get('host') ;
-      let it =  fullUrl.charAt(fullUrl.length-1)
-      if(it == '0'){
-       it = ".example.com"
-      }else{
-       it = ".playsite.store"
-      }
+      // const token = await registered.generateAuthToken();
 
-      console.log("finally")
-      res.cookie("jwt", token, {
-         domain: it,
+
+      res.cookie("id", registered._id, {
         expires: new Date(Date.now() + (1000 * 60 * 60 * 24 * 30)),
         httpOnly: true
       })
-      return res.redirect('/dashboard');
+      return res.json({regester:"success",id:registered._id});
     }
     catch (err) {
       return res.send(err)
     }
   });
 router.post("/login",
-  check('email', 'Valid email is required')
-    .isEmail(),
-  check('password', 'Password is required')
-    .isLength({ min: 1 }),
   async (req, res) => {
 
-    let errors = validationResult(req);
-    console.log(errors);
-    if (!errors.isEmpty()) {
-      return res.status(422).render('auth', {
-        errorMessage: errors.array()[0].msg,
-        doctitle:"login"
-      })
-    }
-
-    try {
-      console.log(req.body)
+try {
+ 
       const email = req.body.email.toLowerCase();
       const password = req.body.password;
 
       const useremail = await Userdb.findOne({ email: email });
       if (useremail) {
-        // console.log(useremail)
-        console.log(useremail.password)
         const result = await bcrypt.compare(password, useremail.password);
-        // console.log(result);
-        // console.log( "this is result ", result);
         if (result) {
-          console.log('a102')
           const token = await useremail.generateAuthToken();
-          let newtokens = [];
-          console.log(useremail.tokens);
-          while(useremail.tokens.length>0 && newtokens.length <= 3){
-            newtokens.push(useremail.tokens.pop());
-          }
-          useremail.tokens = newtokens;
-          await useremail.save();
-          var fullUrl =   req.get('host') ;
-          let it =  fullUrl.charAt(fullUrl.length-1)
-          if(it == '0'){
-           it = ".example.com"
-          }else{
-           it = ".playsite.store"
-          }
-          res.cookie("jwt", token, {
-               domain: it,
+       
+          res.cookie("id", registered._id, {
             expires: new Date(Date.now() + (1000 * 60 * 60 * 24 * 30)),
             httpOnly: true
           })
           
-          return res.redirect('/dashboard');
+          return res.json({status:"success",id:registered._id});
         } else {
-          // return res.send('password mismatch')
+          
           return res.status(422).render('auth', {
             errorMessage: "Incorrect Password",
             doctitle:"login"
@@ -164,19 +94,10 @@ router.post("/login",
       return res.send(err)
     }
   });
-
-
-
 router.get("/logout", async (req, res) => {
-  try {
-    const user = await Userdb.findOne(req.user._id);
-    user.tokens.pop();
-    await user.save();
-  } catch (error) {
-    
-  }
-  res.clearCookie("jwt")
-  return res.redirect('/auth')
+
+  res.clearCookie("id")
+  return res.json({status:'success'})
 
 });
 

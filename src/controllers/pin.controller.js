@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Userdb = require("../models/user.model");
-const Postdb = require("../models/post.model");
+const Postdb = require("../models/pin.model");
 var objectId = require('mongodb').ObjectID;
 const jwt = require('jsonwebtoken')
 const auth = require('../middleware/auth')
@@ -51,7 +51,7 @@ let filedelete = (d)=>{
 
 
 
-router.post("/addpost",auth,async (req, res) => {
+router.post("/addpin",auth,async (req, res) => {
 
 
 
@@ -76,7 +76,7 @@ images = []
      }
 
 
-if(!req.user){
+if(!req.body.userid){
   return res.json({msg:'no user found'})
 }
 
@@ -85,7 +85,7 @@ if(!req.user){
 
 
 const newpost = new Postdb({
-user:req.user._id,
+user:req.body.userid,
 title:req.body.title,
 price:req.body.price,
 description:req.body.about,
@@ -109,15 +109,15 @@ images:images,
   
 router.delete("/:id",auth, async (req, res) => {
     console.log('delete id',req.params.id)
-      if(!req.user){
-        return res.json({msg:req.user,msg2:'not allowed'})
+      if(!req.body.userid){
+        return res.json({msg:req.body.userid,msg2:'not allowed'})
       }
       try {
         Postdb.findById(req.params.id)
         .then(post =>{
     //check for post owner;
   
-  if(post.user.toString() !== req.user._id.toString()){
+  if(post.user.toString() !== req.body.userid.toString()){
       return res.json({ notauthorised:'access denied'})
     }
     //delete post
@@ -169,8 +169,8 @@ router.post("/update/:id",auth, async (req, res) => {
         
         console.log('====>',req.body.title,req.body.txt,req.params.id)
         
-          if(!req.user){
-            return res.json({msg:req.user,msg2:'not allowed'})
+          if(!req.body.userid){
+            return res.json({msg:req.body.userid,msg2:'not allowed'})
           }
           if(!req.body){
             return res.send({ message : "Data to update can not be empty"})
@@ -262,7 +262,7 @@ router.post("/update/:id",auth, async (req, res) => {
         
         
         
-          if(post.user.toString() == req.user._id.toString()){
+          if(post.user.toString() == req.body.userid.toString()){
           await post.updateOne({$set:updated_data})
         
           await new Promise(resolve => setTimeout(resolve, 1000));
@@ -278,24 +278,12 @@ router.post("/update/:id",auth, async (req, res) => {
         }
              });
 
+
              
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+             
 router.get("/fetch", async (req, res) => {
           post = '';
             try {

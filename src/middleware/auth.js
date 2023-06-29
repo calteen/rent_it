@@ -6,7 +6,7 @@ const auth = async (req, res,next) => {
         const token = req.cookies.jwt
 if(!token){
 req.user = "";
-return res.redirect('/auth')
+// return res.redirect('/auth')
 }
 
         const verifyUser = await jwt.verify(token,'jwt')
