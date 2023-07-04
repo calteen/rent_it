@@ -11,8 +11,8 @@ const pinSchema = new mongoose.Schema({
    price: { type: String },
    description: { type: String },
    images: { type: Array },
-   long: {type: Number},
-   lat: {type: Number},
+   long: {type: String},
+   lat: {type: String},
 });
 
 
