@@ -320,7 +320,6 @@ router.get("/fetch/:id", async (req, res) => {
 router.post("/formtemp",async (req, res) => {
   console.log(req.body);
 const newpost = new Postdb({
-            user:"none",
             title:req.body.title,
             price:req.body.price,
             description:req.body.description,
