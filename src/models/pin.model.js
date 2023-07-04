@@ -13,6 +13,7 @@ const pinSchema = new mongoose.Schema({
    images: { type: Array },
    long: {type: String},
    lat: {type: String},
+   phone:{type: String},
 });
 
 
