@@ -278,12 +278,7 @@ router.post("/update/:id",auth, async (req, res) => {
         }
              });
 
-
-             
-
-
-
-             
+         
 router.get("/fetch", async (req, res) => {
           post = '';
             try {
@@ -322,6 +317,28 @@ router.get("/fetch/:id", async (req, res) => {
 
 
 
+router.post("/formtemp",async (req, res) => {
+  console.log(req.body);
+// const newpost = new Postdb({
+//             user:"none",
+//             title:req.body.title,
+//             price:req.body.price,
+//             description:req.body.about,
+//             images:images,
+//               })
+       
+
+
+//               await new Promise(resolve => setTimeout(resolve, 1000));
+            
+//               newpost.save().then((post) => {
+//             return res.json({status:'success'})
+//             }
+//               )
+//             .catch(err =>res.json(err))
+            });
+            
+              
 
 
 
