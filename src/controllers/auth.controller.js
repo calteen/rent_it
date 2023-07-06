@@ -9,8 +9,36 @@ const Userdb = require("../models/user.model");
 router.post("/register", async (req, res) => {
 
 
-  console.log(req.body)
-  res.json({a:"succ"});
+    const phone = req.body.phone;
+    const password = req.body.password;
+    useremail = 0;
+    try {
+      useremail = await Userdb.findOne({ phone: phone });
+    } catch (error) {
+    }
+    
+
+    if (phone) {
+      return res.json({ errorMessage: 'phone already in use' })
+    }
+    try {
+      const hashedPassword = await bcrypt.hash(password, 12);
+      // console.log(hashedPassword);
+      const user = new Userdb(
+        {
+          name:"none",
+          phone: phone,
+          password: hashedPassword
+        }
+      )
+      const registered = await user.save();
+
+
+      return res.json({regester:"success",id:registered._id});
+    }
+    catch (err) {
+      return res.send(err)
+    }
   });
 router.post("/login",
   async (req, res) => {
