@@ -51,7 +51,9 @@ try {
       const phone = req.body.phone;
       const password = req.body.password;
 
+      console.log(req.body);
       const phonedb = await Userdb.findOne({ phone: phone });
+      console.log(phonedb);
       if (phonedb) {
         const result = await bcrypt.compare(password, useremail.password);
         console.log('success1', result)
