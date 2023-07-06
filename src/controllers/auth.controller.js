@@ -8,17 +8,21 @@ const Userdb = require("../models/user.model");
 
 router.post("/register", async (req, res) => {
 
+console.log(req.body);
+
+
 
     const phone = req.body.phone;
     const password = req.body.password;
-    useremail = 0;
+    phonedb = 0;
     try {
-      useremail = await Userdb.findOne({ phone: phone });
+      phonedb = await Userdb.findOne({ phone: phone });
     } catch (error) {
     }
     
 
-    if (phone) {
+    if (phonedb) {
+      console.log(phonedb);
       return res.json({ errorMessage: 'phone already in use' })
     }
     try {
