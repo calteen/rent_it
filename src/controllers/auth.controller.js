@@ -31,7 +31,7 @@ console.log(req.body);
       const user = new Userdb(
         {
           phone: phone,
-          password: password;
+          password: password
         }
       )
       const registered = await user.save();
