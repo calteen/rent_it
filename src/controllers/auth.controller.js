@@ -31,7 +31,7 @@ console.log(req.body);
       const user = new Userdb(
         {
           phone: phone,
-          password: hashedPassword
+          password: password;
         }
       )
       const registered = await user.save();
@@ -56,10 +56,10 @@ try {
       console.log(phonedb);
       if (phonedb) {
         console.log('success01')
-        const result = await bcrypt.compare(password, useremail.password);
-        console.log('success1', result)
+      
+        console.log('success1', password == phonedb.password)
           
-        if (result) {
+        if (password == phonedb.password) {
 
           console.log('success')
           
