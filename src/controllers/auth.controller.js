@@ -46,7 +46,47 @@ console.log(req.body);
 router.post("/login",
   async (req, res) => {
 
-res.json({data: req.body})
+try {
+ 
+      const phone = req.body.phone;
+      const password = req.body.password;
+
+      const phonedb = await Userdb.findOne({ phone: phone });
+      if (phonedb) {
+        const result = await bcrypt.compare(password, useremail.password);
+        console.log('success1', result)
+          
+        if (result) {
+
+          console.log('success')
+          
+          return res.json({status:"success",id:phonedb._id});
+        } else {
+          
+          return res.status(422).json( {
+            errorMessage: "Incorrect Password",
+            doctitle:"login"
+          })
+        }
+
+      }
+      if (!useremail) {
+        // return res.send('email not found')
+        return res.status(422).json( {
+          errorMessage: "User does not exist",
+          doctitle:"login"
+        })
+      }
+
+
+
+
+
+
+    }
+    catch (err) {
+      return res.send(err)
+    }
   });
 router.get("/logout", async (req, res) => {
 
