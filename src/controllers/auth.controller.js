@@ -8,44 +8,9 @@ const Userdb = require("../models/user.model");
 
 router.post("/register", async (req, res) => {
 
-  const name = req.body.name.toLowerCase();
-    const email = req.body.email.toLowerCase();
-    const password = req.body.password;
-    useremail = 0;
-    try {
-      useremail = await Userdb.findOne({ email: email });
-    } catch (error) {
-    }
-    
 
-    if (useremail) {
-      return res.json({ errorMessage: 'email already in use' })
-    }
-    try {
-      const hashedPassword = await bcrypt.hash(password, 12);
-      // console.log(hashedPassword);
-      const user = new Userdb(
-        {
-          name:name,
-          email: email,
-          password: hashedPassword
-        }
-      )
-      const registered = await user.save();
-
-
-      // const token = await registered.generateAuthToken();
-
-
-      res.cookie("id", registered._id, {
-        expires: new Date(Date.now() + (1000 * 60 * 60 * 24 * 30)),
-        httpOnly: true
-      })
-      return res.json({regester:"success",id:registered._id});
-    }
-    catch (err) {
-      return res.send(err)
-    }
+  console.log(req.body)
+  res.json({a:"succ"});
   });
 router.post("/login",
   async (req, res) => {

@@ -7,7 +7,7 @@ const pinController = require("./pin.controller.js");
 
 
 router.use("/pin", pinController);
-// router.use("/auth",authController);
+ router.use("/auth",authController);
 
 router.get("/",(req,res)=>{
     res.json({rent_it_status:'Live'});
