@@ -63,7 +63,7 @@ try {
 
           console.log('success')
           
-          return res.json({status:"success",id:phonedb._id});
+          return res.json({status:"success" ,token:phonedb._id,phone: phonedb.phone});
         } else {
           
           return res.status(422).json( {
