@@ -30,7 +30,6 @@ console.log(req.body);
       // console.log(hashedPassword);
       const user = new Userdb(
         {
-          name:"none",
           phone: phone,
           password: hashedPassword
         }
@@ -49,24 +48,19 @@ router.post("/login",
 
 try {
  
-      const email = req.body.email.toLowerCase();
+      const phone = req.body.phone;
       const password = req.body.password;
 
-      const useremail = await Userdb.findOne({ email: email });
-      if (useremail) {
+      const phonedb = await Userdb.findOne({ phone: phone });
+      if (phonedb) {
         const result = await bcrypt.compare(password, useremail.password);
         if (result) {
-          const token = await useremail.generateAuthToken();
-       
-          res.cookie("id", registered._id, {
-            expires: new Date(Date.now() + (1000 * 60 * 60 * 24 * 30)),
-            httpOnly: true
-          })
+
           
-          return res.json({status:"success",id:registered._id});
+          return res.json({status:"success",id:phonedb._id});
         } else {
           
-          return res.status(422).render('auth', {
+          return res.status(422).json( {
             errorMessage: "Incorrect Password",
             doctitle:"login"
           })
@@ -75,7 +69,7 @@ try {
       }
       if (!useremail) {
         // return res.send('email not found')
-        return res.status(422).render('auth', {
+        return res.status(422).json( {
           errorMessage: "User does not exist",
           doctitle:"login"
         })
