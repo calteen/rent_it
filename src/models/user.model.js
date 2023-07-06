@@ -6,8 +6,8 @@ const jwt = require("jsonwebtoken");
  * @description visits contain total times of user account visited
  */
 const userSchema = new mongoose.Schema({
-  name: { type: String, unique:true },
-  email: { type: String },
+  name: { type: String},
+  phone: { type: String },
   password: { type: String },
   userimg: { type: String},
   about: { type: String},
