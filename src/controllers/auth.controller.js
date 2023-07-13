@@ -36,7 +36,7 @@ console.log(req.body);
       )
       const registered = await user.save();
 
-
+          console.log("return",registered._id)
       return res.json({regester:"success",token:registered._id,phone: phone});
     }
     catch (err) {
