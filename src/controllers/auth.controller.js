@@ -18,12 +18,13 @@ console.log(req.body);
     try {
       phonedb = await Userdb.findOne({ phone: phone });
     } catch (error) {
+      return res.json({ errorMessage: 'not able to find in'})
     }
     
 
     if (phonedb) {
-      console.log(phonedb);
-      return res.json({ errorMessage: 'phone already in use' })
+      console.log("phone db",phonedb);
+      return res.json({ errorMessage: 'phone already in use' });
     }
     try {
       const hashedPassword = await bcrypt.hash(password, 12);
@@ -40,6 +41,7 @@ console.log(req.body);
       return res.json({regester:"success",token:registered._id,phone: phone});
     }
     catch (err) {
+      console.log("err",err);
       return res.send(err)
     }
   });
