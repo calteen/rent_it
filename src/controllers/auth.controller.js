@@ -30,7 +30,7 @@ console.log(req.body);
       const hashedPassword = await bcrypt.hash(password, 12);
       // console.log(hashedPassword);
       const user = new Userdb(
-        { name: "unknown";
+        { name: "unknown",
           phone: phone,
           password: password
         }
